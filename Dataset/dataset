@@ -1,0 +1,36 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
+from sklearn.model_selection import train_test_split
+
+# Función para cargar los datos desde el archivo CSV
+def cargar_datos(archivo):
+    datos = []
+    etiquetas = []
+
+    # Leer el archivo y procesar los datos
+    with open(archivo, 'r') as f:
+        for linea in f:
+            # Dividir cada línea en los 10 números y el one-hot encoding de la etiqueta
+            elementos = linea.strip().split(',')
+            vector = list(map(int, elementos[:10]))  # Los 10 primeros son el vector de entrada
+            etiqueta_one_hot = list(map(float, elementos[10:]))  # Los últimos 5 elementos son el one-hot encoding
+            datos.append(vector)
+            etiquetas.append(etiqueta_one_hot)
+
+    # Convertir listas a arrays de numpy
+    X = np.array(datos)  # Matriz con los vectores de 10 números
+    y = np.array(etiquetas)  # Matriz con los one-hot encoding de las etiquetas
+
+    return X, y
+
+# Cargar los datos del archivo one-hot-encoding.txt
+X, y = cargar_datos('one-hot-encoding.txt')
+
+# Cambiar la forma de X para que sea compatible con LSTM (samples, timesteps, features)
+X = X.reshape((X.shape[0], X.shape[1], 1))
+
+# Dividir los datos en conjunto de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
